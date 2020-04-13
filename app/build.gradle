@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.bluetoothspplibrarytest"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -23,6 +23,12 @@ android {
         }
     }
 
+    // https://stackoverflow.com/questions/49891730/invoke-customs-are-only-supported-starting-with-android-0-min-api-26
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
 }
 
 dependencies {
@@ -35,6 +41,9 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // https://github.com/akexorcist/Android-BluetoothSPPLibrary
-    implementation 'com.akexorcist:bluetoothspp:1.0.0'
+
+    implementation 'com.akexorcist:bluetoothspp:1.0.0' // https://github.com/akexorcist/Android-BluetoothSPPLibrary
+
+    implementation 'com.github.mazenrashed:Printooth:1.2.1'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 }

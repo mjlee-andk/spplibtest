@@ -12,6 +12,8 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP
 import app.akexorcist.bluetotohspp.library.BluetoothSPP.BluetoothConnectionListener
 import app.akexorcist.bluetotohspp.library.BluetoothState
 import app.akexorcist.bluetotohspp.library.DeviceList
+import com.mazenrashed.printooth.Printooth
+import com.mazenrashed.printooth.ui.ScanningActivity
 
 
 class MainActivity : AppCompatActivity() {
@@ -27,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onCreate")
 
         bt = BluetoothSPP(this)
+        Printooth.init(this)
 
         // 블루투스 사용가능여부 체크
         if(bt?.isBluetoothAvailable == false) {
@@ -76,6 +79,17 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        val btnConnectPrinter = findViewById<Button>(R.id.btnConnectPrinter)
+        btnConnectPrinter.setOnClickListener {
+            when (it.id) {
+                R.id.btnConnectPrinter -> {
+                    startActivityForResult(Intent(this, ScanningActivity::class.java), ScanningActivity.SCANNING_FOR_PRINTER)
+                }
+            }
+        }
+
+//        startActivityForResult(Intent(this, ScanningActivity::class.java), ScanningActivity.SCANNING_FOR_PRINTER)
     }
 
     override fun onDestroy() {
@@ -89,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "onStart")
 
-         if (bt?.isBluetoothEnabled == false) { //
+        if (bt?.isBluetoothEnabled == false) { //
             val i: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i, BluetoothState.REQUEST_ENABLE_BT);
         } else {
@@ -104,6 +118,10 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.d(TAG, "onActivityResult")
+
+        if (requestCode == ScanningActivity.SCANNING_FOR_PRINTER && resultCode == Activity.RESULT_OK) {
+            Log.d("onActivityResult", "success")
+        }
 
         if(requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
             if(resultCode == Activity.RESULT_OK) {
