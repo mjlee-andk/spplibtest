@@ -44,6 +44,6 @@ dependencies {
 
     implementation 'com.akexorcist:bluetoothspp:1.0.0' // https://github.com/akexorcist/Android-BluetoothSPPLibrary
 
-    implementation 'com.github.mazenrashed:Printooth:1.2.1'
+    implementation 'com.github.mazenrashed:Printooth:1.2.1' // https://github.com/mazenrashed/Printooth
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
 }

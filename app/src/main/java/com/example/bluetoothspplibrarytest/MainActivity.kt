@@ -13,7 +13,12 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP.BluetoothConnectionListe
 import app.akexorcist.bluetotohspp.library.BluetoothState
 import app.akexorcist.bluetotohspp.library.DeviceList
 import com.mazenrashed.printooth.Printooth
+import com.mazenrashed.printooth.data.printable.Printable
+import com.mazenrashed.printooth.data.printable.TextPrintable
+import com.mazenrashed.printooth.data.printer.DefaultPrinter
 import com.mazenrashed.printooth.ui.ScanningActivity
+import com.mazenrashed.printooth.utilities.PrintingCallback
+import java.net.URLEncoder
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "Bluetooth is available")
 
         bt?.setOnDataReceivedListener { data, message ->
+            Log.d(TAG, "data received")
             // 데이터 수신
             Toast.makeText(this@MainActivity, message, Toast.LENGTH_SHORT).show()
         }
@@ -66,6 +72,25 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        // Listen to your printing order state:
+        Printooth.printer().printingCallback = object : PrintingCallback {
+            override fun connectingWithPrinter() { }
+
+            override fun printingOrderSentSuccessfully() {
+                Log.d(TAG, "Print success")
+            }  //printer was received your printing order successfully.
+
+            override fun connectionFailed(error: String) {
+                Log.d(TAG, "Connection fail")
+            }
+
+            override fun onError(error: String) {
+                Log.d(TAG, "Connection error")
+            }
+
+            override fun onMessage(message: String) { }
+        }
+
         val btnConnect = findViewById<Button>(R.id.btnConnect)
         btnConnect.setOnClickListener {
             when (it.id) {
@@ -89,7 +114,28 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        startActivityForResult(Intent(this, ScanningActivity::class.java), ScanningActivity.SCANNING_FOR_PRINTER)
+        // Printing
+        val btnPrint = findViewById<Button>(R.id.btnPrint)
+        btnPrint.setOnClickListener{
+            when(it.id) {
+                R.id.btnPrint -> {
+                    var testStr = URLEncoder.encode("가나다라마바사", "euc-kr")
+                    var printables = ArrayList<Printable>()
+                    var printable = TextPrintable.Builder()
+                        .setText(testStr) //The text you want to print
+                        .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
+                        .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD) //Bold or normal
+                        .setFontSize(DefaultPrinter.FONT_SIZE_NORMAL)
+                        .setUnderlined(DefaultPrinter.UNDERLINED_MODE_OFF) // Underline on/off
+                        .setCharacterCode(DefaultPrinter.CHARCODE_PC437) // Character code to support languages
+                        .setLineSpacing(DefaultPrinter.LINE_SPACING_60)
+                        .setNewLinesAfter(3) // To provide n lines after sentence
+                        .build()
+                    printables.add(printable)
+                    Printooth.printer().print(printables)
+                }
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -103,6 +149,7 @@ class MainActivity : AppCompatActivity() {
         super.onStart()
         Log.d(TAG, "onStart")
 
+        // 블루투스 꺼져있을 때
         if (bt?.isBluetoothEnabled == false) { //
             val i: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(i, BluetoothState.REQUEST_ENABLE_BT);
@@ -120,7 +167,9 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "onActivityResult")
 
         if (requestCode == ScanningActivity.SCANNING_FOR_PRINTER && resultCode == Activity.RESULT_OK) {
-            Log.d("onActivityResult", "success")
+            Log.d(TAG, "printooth")
+            var pairedPrinter = Printooth.getPairedPrinter()
+            return
         }
 
         if(requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
